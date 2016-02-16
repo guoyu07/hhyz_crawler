@@ -7,8 +7,14 @@
 
 import scrapy
 
+class ContentItem(scrapy.Item):
+    title = scrapy.Field()#标题
+    special_title = scrapy.Field()#特殊标题
+    tags = scrapy.Field()#标签
+    link = scrapy.Field()#链接
+    content = scrapy.Field()#内容
+    categories = scrapy.Field()#分类
+    img=scrapy.Field()#文章图片
+    store=scrapy.Field()#商城
 
-class HhyzItem(scrapy.Item):
-    # define the fields for your item here like:
-    # name = scrapy.Field()
-    pass
+
