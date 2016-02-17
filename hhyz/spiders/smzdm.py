@@ -48,6 +48,7 @@ class SmzdmSpider(scrapy.spiders.Spider):
         if len(imglist)!=0:
             url=imglist[0]
             real_path=get_img_path(url)
+
             content+='<img src="'+real_path+'" width=400 height=300 class=""/>'
         self.file.write(content)
         item['content']=content
@@ -60,5 +61,7 @@ class SmzdmSpider(scrapy.spiders.Spider):
         for url in urls:
             if not self.is_used_url(url.extract()[0]):
                 yield Request(url.extract(),callback=self.parse_item)
+
     def close(self):
         self.client.close()
+

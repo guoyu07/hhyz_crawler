@@ -44,3 +44,4 @@ class ItemSavePipeline(object):
         cur.close()
         self.conn.commit()
 
+

@@ -19,3 +19,4 @@ def get_img_path(url):
 
 
 print get_img_path('http://imgsrc.baidu.com/forum/w%3D580/sign=d096f1149c16fdfad86cc6e6848f8cea/ccde18fa513d26972e97026254fbb2fb4316d87f.jpg')
+
