@@ -1,3 +1,4 @@
+import MySQLdb
 
 def save_item(item):
     pass
