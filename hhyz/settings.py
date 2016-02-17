@@ -83,3 +83,14 @@ ITEM_PIPELINES = {
 #HTTPCACHE_DIR='httpcache'
 #HTTPCACHE_IGNORE_HTTP_CODES=[]
 #HTTPCACHE_STORAGE='scrapy.extensions.httpcache.FilesystemCacheStorage'
+
+
+MYSQL_HOST='127.0.0.1'
+MYSQL_USERNAME='root'
+MYSQL_PASSWD=''
+MYSQL_DB='hhyz'
+MYSQL_PORT=3306
+
+MONGO_URI=''
+MONGO_DB='crawler'
+MONGO_PORT=27017

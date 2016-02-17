@@ -1,19 +1,35 @@
 # encoding=utf-8
 import scrapy
-from scrapy.contrib.loader import ItemLoader
-from scrapy.selector import Selector
+import pymongo
 from scrapy.http import Request
 from ..items import ContentItem
 from ..imgtools import get_img_path
-from BeautifulSoup import BeautifulSoup
 import sys
 reload(sys)
 sys.setdefaultencoding("utf-8")
+'''
+什么值得买的网站爬虫
+网址:http://www.smzdm.com/
+'''
+
 class SmzdmSpider(scrapy.spiders.Spider):
     name='smzdm'
     allowed_domains=['www.smzdm.com']
     start_urls=['http://www.smzdm.com/']
     file=open('content.txt','a')
+    def __init__(self):
+        super(SmzdmSpider,self).__init__()
+        self.client=pymongo.MongoClient(self.settings.get("MONGO_URI"))
+        self.db=self.client[self.settings.get('MONGO_DB')]
+    #将访问过的url添加到数据库中
+    def add_url(self,url):
+        self.db[self.name].insert({'url':url})
+    #如果访问过该url就跳过
+    def is_used_url(self,url):
+        if self.db[self.name].find_one({'url':url})!=None:
+            return True
+        else:
+            return False
     def parse_item(self,response):
         # 填充基本数据
         item=ContentItem()
@@ -30,8 +46,9 @@ class SmzdmSpider(scrapy.spiders.Spider):
             content+='<p>'+p+'</p>'
         imglist=response.xpath('//div[contains(@class,"bigImgContent")]/img/@src').extract()
         if len(imglist)!=0:
-            path=imglist[0]
-            real_path=get_img_path(path)
+            url=imglist[0]
+            real_path=get_img_path(url)
+
             content+='<img src="'+real_path+'" width=400 height=300 class=""/>'
         self.file.write(content)
         item['content']=content
@@ -40,6 +57,11 @@ class SmzdmSpider(scrapy.spiders.Spider):
             item['tags']=u''
         return item
     def parse(self,response):
-        lists=response.xpath('//div[contains(@class,"leftWrap")]/div[contains(@class,"list")]/div/h4[contains(@class,"itemName")]/a/@href')
-        for list in lists:
-            yield Request(list.extract(),callback=self.parse_item)
+        urls=response.xpath('//div[contains(@class,"leftWrap")]/div[contains(@class,"list")]/div/h4[contains(@class,"itemName")]/a/@href')
+        for url in urls:
+            if not self.is_used_url(url.extract()[0]):
+                yield Request(url.extract(),callback=self.parse_item)
+
+    def close(self):
+        self.client.close()
+
