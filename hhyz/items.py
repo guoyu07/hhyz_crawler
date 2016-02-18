@@ -16,5 +16,8 @@ class ContentItem(scrapy.Item):
     categories = scrapy.Field()#分类
     img=scrapy.Field()#文章图片
     store=scrapy.Field()#商城
+    from_name=scrapy.Field()#来自网站
+    from_url=scrapy.Field()#来自网址
+
 
 

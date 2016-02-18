@@ -5,6 +5,16 @@
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
 import MySQLdb
+from scrapy.exceptions import DropItem
+class ItemFilterPipeline(object):
+    def process_item(self, item, spider):
+        if item.get('title')==None or item.get('img')==None or \
+            item.get('special_title')==None or item.get('content')==None \
+            or item.get('link')==None or item['categories']==None:
+            raise DropItem('drop a item ',item)
+        if item.get('tags')==None:
+            item['tags']=u''
+        return item
 
 class ItemSavePipeline(object):
     def __init__(self, host, username,passwd,port,db):
@@ -20,8 +30,8 @@ class ItemSavePipeline(object):
             host=crawler.settings.get('MYSQL_HOST'),
             username=crawler.settings.get('MYSQL_USERNAME'),
             passwd=crawler.settings.get('MYSQL_PASSWD'),
-            port=crawler.settings.get('MYSQL_DB'),
-            db=crawler.settings.get('MYSQL_PORT')
+            port=crawler.settings.get('MYSQL_PORT'),
+            db=crawler.settings.get('MYSQL_DB')
         )
 
     def open_spider(self, spider):
@@ -37,11 +47,12 @@ class ItemSavePipeline(object):
 
     def process_item(self, item, spider):
         cur=self.conn.cursor()
-        cur.execute('insert into users(title,special_title,tags,link,content,categories,img,store)'
-                    ' values(%s,%s,%s,%s,%s,%s,%s,%s,)',
+        cur.execute('insert into users(title,special_title,tags,link,content,categories,img,store,from_name,from_url)'
+                    ' values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)',
                     [item['title'],item['special_title'],item['tags'],item['link'],item['content'],
-                     item['categories'],item['img'],item['store'],]);
+                     item['categories'],item['img'],item['store'],item['from_name'],item['from_url']]);
+        # cur.execute('insert into users(title)'
+        #             ' values(%s)',
+        #             [item['title']]);
         cur.close()
         self.conn.commit()
-
-

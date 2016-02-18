@@ -62,7 +62,8 @@ NEWSPIDER_MODULE = 'hhyz.spiders'
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-   'hhyz.pipelines.HhyzPipeline': 300,
+   'hhyz.pipelines.ItemFilterPipeline': 200,
+   'hhyz.pipelines.ItemSavePipeline': 300,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -88,9 +89,9 @@ ITEM_PIPELINES = {
 MYSQL_HOST='127.0.0.1'
 MYSQL_USERNAME='root'
 MYSQL_PASSWD=''
-MYSQL_DB='hhyz'
+MYSQL_DB='test'
 MYSQL_PORT=3306
 
-MONGO_URI=''
-MONGO_DB='crawler'
+MONGO_URI='127.0.0.1'
+MONGO_DB='hhyz'
 MONGO_PORT=27017
