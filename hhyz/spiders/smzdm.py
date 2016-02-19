@@ -75,5 +75,5 @@ class SmzdmSpider(scrapy.spiders.Spider):
                 yield Request(url.extract(),callback=self.parse_item)
 
     def close(self):
-        self.client.close()
+        self.client.close()#关闭连接
 
