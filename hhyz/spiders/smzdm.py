@@ -3,7 +3,7 @@ import scrapy
 import pymongo
 from scrapy.http import Request
 from ..items import ContentItem
-from ..imgtools import get_img_path
+from ..tools import get_img_path,is_low_price
 import sys
 reload(sys)
 sys.setdefaultencoding("utf-8")
@@ -34,7 +34,9 @@ class SmzdmSpider(scrapy.spiders.Spider):
         item['title']=response.xpath('//h1[contains(@class,"article_title ")]/text()').extract()[0]
         item['special_title']=response.xpath('//h1[contains(@class,"article_title ")]/span/text()').extract()[0]
         item['store']=response.xpath('//div[contains(@class,"article_meta")][2]/span[1]/a/text()').extract()[0]
-        item['categories']=response.xpath('//span[contains(@itemprop,"title")][2]/text()').extract()[0]
+        classification=response.xpath('//span[contains(@itemprop,"title")][2]/text()').extract()
+        if len(classification)!=0:
+            item['classification']=classification[0]
         #处理链接
         link=response.xpath('//div[contains(@class,"buy")]/a/@href[1]').extract()
         if len(link)!=0:
@@ -55,12 +57,15 @@ class SmzdmSpider(scrapy.spiders.Spider):
         if len(imglist)!=0:
             url=imglist[0]
             real_path=get_img_path(url)
-            content+='<img src="'+real_path+'" width=400 height=300 class=""/>'
+            content+='<img src="'+real_path+'"  class="content-img"/>'
         else:
             real_path=get_img_path(item['img'])
-            content+='<img src="'+real_path+'" width=400 height=300 class=""/>'
+            content+='<img src="'+real_path+'" class="content-img"/>'
 
         item['content']=content
+        item['category']=response.xpath('//div[contains(@class,"yhjingxuan")]/span/text()').extract()[0]
+        if is_low_price(item['special_title']):
+            item['category']=u'白菜价'
         item['from_name']=u'什么值得买'
         item['from_url']=u'http://www.smzdm.com/'
         self.add_url(response.url)

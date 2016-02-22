@@ -10,7 +10,7 @@ class ItemFilterPipeline(object):
     def process_item(self, item, spider):
         if item.get('title')==None or item.get('img')==None or \
             item.get('special_title')==None or item.get('content')==None \
-            or item.get('link')==None or item['categories']==None:
+            or item.get('link')==None or item.get('classification')==None or item.get('category')==None:
             raise DropItem('drop a item ',item)
         if item.get('tags')==None:
             item['tags']=u''
@@ -47,12 +47,16 @@ class ItemSavePipeline(object):
 
     def process_item(self, item, spider):
         cur=self.conn.cursor()
-        cur.execute('insert into users(title,special_title,tags,link,content,categories,img,store,from_name,from_url)'
-                    ' values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)',
-                    [item['title'],item['special_title'],item['tags'],item['link'],item['content'],
-                     item['categories'],item['img'],item['store'],item['from_name'],item['from_url']]);
-        # cur.execute('insert into users(title)'
-        #             ' values(%s)',
-        #             [item['title']]);
-        cur.close()
-        self.conn.commit()
+        try:
+            cur.execute('select id from classification where name=%s',[item['classification']])
+            _id=cur.fetchone()[0]
+            cur.execute('insert into posts(title,special_title,tags,link,content,category,img,store,from_name,'
+                        'from_url,classification_id,up,down,timestamp) values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,NOW())',
+                        [item['title'],item['special_title'],item['tags'],item['link'],item['content'],
+                         item['category'],item['img'],item['store'],item['from_name'],item['from_url'],_id,0,0]);
+            cur.close()
+            self.conn.commit()
+        except Exception,e:
+            print e
+            self.conn.rollback()
+
