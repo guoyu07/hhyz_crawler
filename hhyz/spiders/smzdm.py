@@ -47,7 +47,7 @@ class SmzdmSpider(scrapy.spiders.Spider):
         #处理标签
         tags=response.xpath('//span[contains(@class,"tags")]/a/text()').extract()
         if len(tags)!=0:
-            item['tags']=tags[0]
+            item['tags']=tags
         #处理内容
         content=''
         list=response.xpath('//div[contains(@class,"inner-block")]/p/text()').extract()
